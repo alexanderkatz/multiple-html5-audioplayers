@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title></title>
+	<link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+	<!-- This is a simple prototype for two audio players on one page -->
+	<!-- #music1 -->
+	<audio id="music1" preload="true">
+		<source src="audio/heardemsay.m4a">
+	</audio>
+
+	<!-- #music2 -->
+	<audio id="music2" preload="true">
+		<source src="audio/touchthesky.m4a">
+	</audio>
+
+	<!-- #audioplayer1 -->
+	<div id="audioplayer0" class="audioplayer">
+		<button id="pButton0" class="play pButton"></button>
+		<div id="timeline0" class="timeline">
+			<div id="playhead0" class="playhead"></div>
+		</div>
+	</div>
+
+	<!-- #audioplayer2 -->
+	<div id="audioplayer1" class="audioplayer">
+		<button id="pButton1" class="play pButton"></button>
+		<div id="timeline1" class="timeline">
+			<div id="playhead1" class="playhead"></div>
+		</div>
+	</div>
+
+
+	<!--<div id="audio-players"></div>-->
+
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	<!--	<script src="js/init.js"></script>-->
+	<script src="js/audioplayer.js"></script>
+
+</body>
+
+</html>
