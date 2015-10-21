@@ -2,10 +2,11 @@
 document.addEventListener("DOMContentLoaded", theDomHasLoaded, false);
 
 // array of audio files
-var files = ["driveslow.m4a",
-			"golddigger.m4a",
-			"heardemsay.m4a",
-			"touchthesky.m4a"];
+var files = ["driveslow.m4a", // 0 = 272 secs
+			"golddigger.m4a", // 1 = 207 secs
+			"heardemsay.m4a", // 2 = 203 secs
+			"touchthesky.m4a" // 3 = 236 secs
+			];
 
 // array of audio element, id, and duration
 var audioList = [];
@@ -14,25 +15,34 @@ function populateAudioList() {
 	var audioElements = document.getElementsByClassName("audio");
 	for (i = 0; i < audioElements.length; i++) {
 		audioList.push({
-			element: audioElements[i],
 			id: audioElements[i].id,
+			element: audioElements[i],
 			duration: 0
 		});
 	}
 }
 
 // getDuration
+// get Duration and update audioList
 function getDuration() {
 	for (i = 0; i < audioList.length; i++) {
 		audioList[i].element.addEventListener("durationchange", function () {
-			// Why can't I get duration with this.element.duration
 			var duration = document.getElementById(this.id).duration;
-			console.log(duration);
+			var index = getAudioListIndex(this.id);
+			audioList[index].duration = duration;
 		}, false);
 	}
 }
 
-
+// getAudioListIndex
+// Given an id, find the index of element in audioList
+function getAudioListIndex(id) {
+	for (x in audioList) {
+		if (audioList[x].id == id) {
+			return x;
+		}
+	}
+}
 ///////////////////////////////////////////////
 // GENERATE HTML FOR AUDIO ELEMENTS AND PLAYERS
 ///////////////////////////////////////////////
