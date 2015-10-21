@@ -7,37 +7,30 @@ var files = ["driveslow.m4a",
 			"heardemsay.m4a",
 			"touchthesky.m4a"];
 
-// array of audio and pertinent info
+// array of audio element, id, and duration
 var audioList = [];
 
 function populateAudioList() {
 	var audioElements = document.getElementsByClassName("audio");
 	for (i = 0; i < audioElements.length; i++) {
 		audioList.push({
+			element: audioElements[i],
 			id: audioElements[i].id,
 			duration: 0
 		});
 	}
 }
 
-// Async? How to fix this
+// getDuration
 function getDuration() {
 	for (i = 0; i < audioList.length; i++) {
-		var audio = document.getElementById(audioList[i].id);
-		console.log(document.getElementById(audioList[i].id));
-		audio.addEventListener("canplaythrough", function () {
-			console.log(audio.duration);
+		audioList[i].element.addEventListener("durationchange", function () {
+			// Why can't I get duration with this.element.duration
+			var duration = document.getElementById(this.id).duration;
+			console.log(duration);
 		}, false);
 	}
 }
-//		audioList[i].addEventListener("canplaythrough", function () {
-//					durations[i] = audioList[i].duration;
-//					//		}, false);
-//				}
-//			}
-//			//}
-
-
 
 
 ///////////////////////////////////////////////
@@ -71,6 +64,8 @@ function theDomHasLoaded(e) {
 	populateAudioList();
 
 	getDuration();
+
+
 
 
 }
