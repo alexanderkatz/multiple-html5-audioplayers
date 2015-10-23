@@ -32,6 +32,8 @@ AudioObject.prototype.bindAudioPlayer = function (num) {
 	this.playbutton = document.getElementById("playbutton-" + num);
 	this.timeline = document.getElementById("timeline-" + num);
 	this.playhead = document.getElementById("playhead-" + num);
+	this.timelineWidth = this.timeline.offsetWidth - this.playhead.offsetWidth
+
 }
 
 // populateAudioList
@@ -49,7 +51,7 @@ function populateAudioList() {
 /* addEventListeners() */
 AudioObject.prototype.addEventListeners = function () {
 	console.log("Add Event Listeners");
-	this.audio.addEventListener("timeupdate", timeUpdate, false);
+	this.audio.addEventListener("timeupdate", AudioObject.prototype.timeUpdate, false);
 }
 
 // getDuration
@@ -91,12 +93,15 @@ AudioObject.prototype.play = function () {
 
 // timeUpdate 
 // Synchronizes playhead position with current point in audio 
-function timeUpdate() {
-	var playPercent = timelineWidth * (music.currentTime / duration);
-	playhead.style.marginLeft = playPercent + "px";
-	if (music.currentTime == duration) {
-		pButton.className = "";
-		pButton.className = "play";
+// this is the html audio element
+AudioObject.prototype.timeUpdate = function () {
+	// audio element's AudioObject
+	var audioObject = audioList[getAudioListIndex(this.id)];
+	var playPercent = audioObject.timelineWidth * (audioObject.audio.currentTime / audioObject.duration);
+	audioObject.playhead.style.marginLeft = playPercent + "px";
+	if (audioObject.audio.currentTime == audioObject.duration) {
+		audioObject.playbutton.className = "";
+		audioObject.playbutton.className = "play";
 	}
 }
 
