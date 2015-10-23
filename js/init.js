@@ -14,38 +14,24 @@ var files = ["driveslow.m4a", // 0 = 272 secs
 
 // array for AudioObjects
 var audioList = [];
+// store AudioObject that is currently playing
+var playingAudio = null;
 
 // AudioObject Constructor
-function AudioObject(element, duration) {
-	this.element = element;
-	this.id = element.id;
+function AudioObject(audio, duration) {
+	this.audio = audio;
+	this.id = audio.id;
 	this.duration = duration;
 }
-
-// Connects Audio Player to AudioObject
-// This asscosciates the play button and other player elements with the correct AudioObject
-// num is used to find the correct pieces of the audio player
+/* bindAudioPlayer
+ * Store audioplayer components in correct AudioObject
+ * num identifes correct audioplayer
+ */
 AudioObject.prototype.bindAudioPlayer = function (num) {
 	this.audioplayer = document.getElementById("audioplayer-" + num);
 	this.playbutton = document.getElementById("playbutton-" + num);
 	this.timeline = document.getElementById("timeline-" + num);
 	this.playhead = document.getElementById("playhead-" + num);
-}
-
-// play
-AudioObject.prototype.play = function () {
-	// start music
-	if (this.element.paused) {
-		this.element.play();
-		// remove play, add pause
-		this.playbutton.className = "";
-		this.playbutton.className = "playbutton pause";
-	} else { // pause music
-		this.element.pause();
-		// remove pause, add play
-		this.playbutton.className = "";
-		this.playbutton.className = "playbutton play";
-	}
 }
 
 // populateAudioList
@@ -56,19 +42,72 @@ function populateAudioList() {
 			new AudioObject(audioElements[i], 0)
 		);
 		audioList[i].bindAudioPlayer(i);
+		audioList[i].addEventListeners();
 	}
+}
+
+/* addEventListeners() */
+AudioObject.prototype.addEventListeners = function () {
+	console.log("Add Event Listeners");
+	this.audio.addEventListener("timeupdate", timeUpdate, false);
 }
 
 // getDuration
 // get Duration and update audioList
 function getDuration() {
 	for (i = 0; i < audioList.length; i++) {
-		audioList[i].element.addEventListener("durationchange", function () {
+		audioList[i].audio.addEventListener("durationchange", function () {
 			var duration = document.getElementById(this.id).duration;
 			var index = getAudioListIndex(this.id);
 			audioList[index].duration = duration;
 		}, false);
 	}
+}
+
+///////////////////////////////////////////////
+// Update Audio Player
+///////////////////////////////////////////////
+
+/* play() 
+ * play or pause selected audio, if there is a song playing pause it
+ */
+AudioObject.prototype.play = function () {
+	if (this == playingAudio) {
+		playingAudio = null;
+		this.audio.pause();
+		changeClass(this.playbutton, "playbutton play");
+	}
+	// else check if playing audio exists and pause it, then start this
+	else {
+		if (playingAudio != null) {
+			playingAudio.audio.pause();
+			changeClass(playingAudio.playbutton, "playbutton play");
+		}
+		this.audio.play();
+		playingAudio = this;
+		changeClass(this.playbutton, "playbutton pause");
+	}
+}
+
+// timeUpdate 
+// Synchronizes playhead position with current point in audio 
+function timeUpdate() {
+	var playPercent = timelineWidth * (music.currentTime / duration);
+	playhead.style.marginLeft = playPercent + "px";
+	if (music.currentTime == duration) {
+		pButton.className = "";
+		pButton.className = "play";
+	}
+}
+
+///////////////////////////////////////////////
+// Utility Methods
+///////////////////////////////////////////////
+
+// changeClass 
+// - overwrites element's class names
+function changeClass(element, newClasses) {
+	element.className = newClasses;
 }
 
 // getAudioListIndex
@@ -81,29 +120,6 @@ function getAudioListIndex(id) {
 	}
 }
 
-///////////////////////////////////////////////
-// Control Audio Player
-///////////////////////////////////////////////
-
-//for (i = 0; i < audioList.length; i++) {
-//	audioList[i].element.addEventListener("click", function () {});
-//}
-
-//Play and Pause
-function play() {
-	// start music
-	if (music.paused) {
-		music.play();
-		// remove play, add pause
-		playbutton.className = "";
-		playbutton.className = "pause";
-	} else { // pause music
-		music.pause();
-		// remove pause, add play
-		playbutton.className = "";
-		playbutton.className = "play";
-	}
-}
 ///////////////////////////////////////////////
 // GENERATE HTML FOR AUDIO ELEMENTS AND PLAYERS
 ///////////////////////////////////////////////
