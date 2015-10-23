@@ -38,13 +38,13 @@ AudioObject.prototype.play = function () {
 	if (this.element.paused) {
 		this.element.play();
 		// remove play, add pause
-		playbutton.className = "";
-		playbutton.className = "pause";
+		this.playbutton.className = "";
+		this.playbutton.className = "playbutton pause";
 	} else { // pause music
 		this.element.pause();
 		// remove pause, add play
-		playbutton.className = "";
-		playbutton.className = "play";
+		this.playbutton.className = "";
+		this.playbutton.className = "playbutton play";
 	}
 }
 
