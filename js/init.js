@@ -8,17 +8,54 @@ var files = ["driveslow.m4a", // 0 = 272 secs
 			"touchthesky.m4a" // 3 = 236 secs
 			];
 
-// array of audio element, id, and duration
+///////////////////////////////////////////////
+// Find and store audio info
+///////////////////////////////////////////////
+
+// array for AudioObjects
 var audioList = [];
 
+// AudioObject Constructor
+function AudioObject(element, duration) {
+	this.element = element;
+	this.id = element.id;
+	this.duration = duration;
+}
+
+// Connects Audio Player to AudioObject
+// This asscosciates the play button and other player elements with the correct AudioObject
+// num is used to find the correct pieces of the audio player
+AudioObject.prototype.bindAudioPlayer = function (num) {
+	this.audioplayer = document.getElementById("audioplayer-" + num);
+	this.playbutton = document.getElementById("playbutton-" + num);
+	this.timeline = document.getElementById("timeline-" + num);
+	this.playhead = document.getElementById("playhead-" + num);
+}
+
+// play
+AudioObject.prototype.play = function () {
+	// start music
+	if (this.element.paused) {
+		this.element.play();
+		// remove play, add pause
+		playbutton.className = "";
+		playbutton.className = "pause";
+	} else { // pause music
+		this.element.pause();
+		// remove pause, add play
+		playbutton.className = "";
+		playbutton.className = "play";
+	}
+}
+
+// populateAudioList
 function populateAudioList() {
 	var audioElements = document.getElementsByClassName("audio");
 	for (i = 0; i < audioElements.length; i++) {
-		audioList.push({
-			id: audioElements[i].id,
-			element: audioElements[i],
-			duration: 0
-		});
+		audioList.push(
+			new AudioObject(audioElements[i], 0)
+		);
+		audioList[i].bindAudioPlayer(i);
 	}
 }
 
@@ -43,6 +80,30 @@ function getAudioListIndex(id) {
 		}
 	}
 }
+
+///////////////////////////////////////////////
+// Control Audio Player
+///////////////////////////////////////////////
+
+//for (i = 0; i < audioList.length; i++) {
+//	audioList[i].element.addEventListener("click", function () {});
+//}
+
+//Play and Pause
+function play() {
+	// start music
+	if (music.paused) {
+		music.play();
+		// remove play, add pause
+		playbutton.className = "";
+		playbutton.className = "pause";
+	} else { // pause music
+		music.pause();
+		// remove pause, add play
+		playbutton.className = "";
+		playbutton.className = "play";
+	}
+}
 ///////////////////////////////////////////////
 // GENERATE HTML FOR AUDIO ELEMENTS AND PLAYERS
 ///////////////////////////////////////////////
@@ -60,7 +121,7 @@ function createAudioElements() {
 // create audio players for each file in files
 function createAudioPlayers() {
 	for (f in files) {
-		var playerString = "<div id=\"audioplayer-" + f + "\" class=\"audioplayer\"><button id=\"pButton-" + f + "\" class=\"play pButton\"></button><div id=\"timeline-" + f + "\" class=\"timeline\"><div id=\"playhead-" + f + "\" class=\"playhead\"></div></div></div>";
+		var playerString = "<div id=\"audioplayer-" + f + "\" class=\"audioplayer\"><button id=\"playbutton-" + f + "\" class=\"play playbutton\"></button><div id=\"timeline-" + f + "\" class=\"timeline\"><div id=\"playhead-" + f + "\" class=\"playhead\"></div></div></div>";
 		$("#audio-players").append(playerString);
 	}
 }
@@ -72,7 +133,6 @@ function theDomHasLoaded(e) {
 
 	// Populate Audio List
 	populateAudioList();
-
 	getDuration();
 
 
