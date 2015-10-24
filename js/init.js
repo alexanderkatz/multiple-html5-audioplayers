@@ -1,10 +1,7 @@
-// Might want to make a lookup table so I have each element associated with the proper
-// Audio Element
-
 // Event listener for DOM
 document.addEventListener("DOMContentLoaded", theDOMHasLoaded, false);
 
-// array of audio files
+// array of audio files (stored in a folder called audio)
 var files = ["holdingon.mp3", // 0
 			"magnets.mp3", // 1
 			"nocturnal.mp3", // 2
