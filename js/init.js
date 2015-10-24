@@ -5,10 +5,10 @@
 document.addEventListener("DOMContentLoaded", theDOMHasLoaded, false);
 
 // array of audio files
-var files = ["driveslow.m4a", // 0 = 272 secs
-			"golddigger.m4a", // 1 = 207 secs
-			"heardemsay.m4a", // 2 = 203 secs
-			"touchthesky.m4a" // 3 = 236 secs
+var files = ["holdingon.mp3", // 0
+			"magnets.mp3", // 1
+			"nocturnal.mp3", // 2
+			"willingandable.mp3" // 3
 			];
 
 ///////////////////////////////////////////////
@@ -174,6 +174,7 @@ AudioObject.prototype.timeUpdate = function () {
 	if (ao.audio.currentTime == ao.duration) {
 		changeClass(ao.playbutton, "playbutton play");
 		ao.audio.currentTime = 0;
+		ao.audio.pause();
 		playingAudio = null;
 	}
 }
