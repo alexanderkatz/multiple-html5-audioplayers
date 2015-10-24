@@ -21,6 +21,8 @@ var audioList = [];
 var componentDict = {};
 // store AudioObject that is currently playing
 var playingAudio = null;
+// store playhead id if one is being dragged
+var onplayhead = null;
 
 /* AudioObject Constructor */
 function AudioObject(audio, duration) {
@@ -68,6 +70,9 @@ AudioObject.prototype.addEventListeners = function () {
 	this.audio.addEventListener("timeupdate", AudioObject.prototype.timeUpdate, false);
 	this.timeline.addEventListener("click", AudioObject.prototype.timelineClick, false);
 	this.playbutton.addEventListener("click", AudioObject.prototype.pressPlay, false);
+	// Makes playhead draggable 
+	this.playhead.addEventListener('mousedown', AudioObject.prototype.mouseDown, false);
+	window.addEventListener('mouseup', mouseUp, false);
 }
 
 /* getDuration
@@ -117,13 +122,52 @@ AudioObject.prototype.play = function () {
 }
 
 /* timelineClick()
- *
+ * get timeline's AudioObject
  */
 AudioObject.prototype.timelineClick = function (event) {
-	console.log("This: " + this.id);
-	// find audio object
-	//	moveplayhead(event);
-	//	music.currentTime = duration * clickPercent(event);
+	var ao = audioList[getAudioListIndex(this.id)];
+	ao.audio.currentTime = ao.audio.duration * clickPercent(event, ao.timeline, ao.timelineWidth);
+}
+
+/* mouseDown */
+AudioObject.prototype.mouseDown = function (event) {
+	onplayhead = this.id;
+	console.log("mouseDown, onplayhead: "+onplayhead);
+	var ao = audioList[getAudioListIndex(this.id)];
+
+	window.addEventListener('mousemove', moveplayhead, true);
+	ao.audio.removeEventListener('timeupdate', AudioObject.prototype.timeUpdate, false);
+}
+
+// mouseUp EventListener
+// getting input from all mouse clicks
+function mouseUp(e) {
+	if (onplayhead != null) {
+		console.log("MOUSEUP NOT NULL");
+		var ao = audioList[getAudioListIndex(onplayhead)];
+		//		moveplayhead(e);
+		window.removeEventListener('mousemove', moveplayhead, true);
+		// change current time
+		ao.audio.currentTime = ao.audio.duration * clickPercent(e, ao.timeline, ao.timelineWidth);
+		ao.audio.addEventListener('timeupdate', AudioObject.prototype.timeUpdate, false);
+	}
+	onplayhead = null;
+}
+
+/* mousemove EventListener
+ * Moves playhead as user drags */
+function moveplayhead(e) {
+	var ao = audioList[getAudioListIndex(onplayhead)];
+	var newMargLeft = e.pageX - ao.timeline.offsetLeft;
+	if (newMargLeft >= 0 && newMargLeft <= ao.timelineWidth) {
+		document.getElementById(onplayhead).style.marginLeft = newMargLeft + "px";
+	}
+	if (newMargLeft < 0) {
+		playhead.style.marginLeft = "0px";
+	}
+	if (newMargLeft > ao.timelineWidth) {
+		playhead.style.marginLeft = ao.timelineWidth + "px";
+	}
 }
 
 /* timeUpdate 
@@ -132,12 +176,14 @@ AudioObject.prototype.timelineClick = function (event) {
  */
 AudioObject.prototype.timeUpdate = function () {
 	// audio element's AudioObject
-	var audioObject = audioList[getAudioListIndex(this.id)];
-	var playPercent = audioObject.timelineWidth * (audioObject.audio.currentTime / audioObject.duration);
-	audioObject.playhead.style.marginLeft = playPercent + "px";
-	if (audioObject.audio.currentTime == audioObject.duration) {
-		audioObject.playbutton.className = "";
-		audioObject.playbutton.className = "play";
+	var ao = audioList[getAudioListIndex(this.id)];
+	var playPercent = ao.timelineWidth * (ao.audio.currentTime / ao.duration);
+	ao.playhead.style.marginLeft = playPercent + "px";
+	// If song is over
+	if (ao.audio.currentTime == ao.duration) {
+		changeClass(ao.playbutton, "playbutton play");
+		ao.audio.currentTime = 0;
+		playingAudio = null;
 	}
 }
 
@@ -159,7 +205,7 @@ function getAudioListIndex(id) {
 
 /* clickPercent()
  * returns click as decimal (.77) of the total timelineWidth */
-function clickPercent(e, timeline) {
+function clickPercent(e, timeline, timelineWidth) {
 	return (e.pageX - timeline.offsetLeft) / timelineWidth;
 }
 
