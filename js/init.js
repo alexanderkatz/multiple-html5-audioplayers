@@ -76,8 +76,6 @@ function populateComponentDictionary() {
 	}
 }
 
-
-
 ///////////////////////////////////////////////
 // Update Audio Player
 ///////////////////////////////////////////////
@@ -130,7 +128,7 @@ AudioObject.prototype.timelineClick = function (event) {
 AudioObject.prototype.mouseDown = function (event) {
 	onplayhead = this.id;
 	var ao = audioList[getAudioListIndex(this.id)];
-	window.addEventListener('mousemove', moveplayhead, true);
+	window.addEventListener('mousemove', AudioObject.prototype.moveplayhead, true);
 	ao.audio.removeEventListener('timeupdate', AudioObject.prototype.timeUpdate, false);
 }
 
@@ -139,8 +137,7 @@ AudioObject.prototype.mouseDown = function (event) {
 function mouseUp(e) {
 	if (onplayhead != null) {
 		var ao = audioList[getAudioListIndex(onplayhead)];
-		//		moveplayhead(e);
-		window.removeEventListener('mousemove', moveplayhead, true);
+		window.removeEventListener('mousemove', AudioObject.prototype.moveplayhead, true);
 		// change current time
 		ao.audio.currentTime = ao.audio.duration * clickPercent(e, ao.timeline, ao.timelineWidth);
 		ao.audio.addEventListener('timeupdate', AudioObject.prototype.timeUpdate, false);
@@ -150,7 +147,7 @@ function mouseUp(e) {
 
 /* mousemove EventListener
  * Moves playhead as user drags */
-function moveplayhead(e) {
+AudioObject.prototype.moveplayhead = function (e) {
 	var ao = audioList[getAudioListIndex(onplayhead)];
 	var newMargLeft = e.pageX - ao.timeline.offsetLeft;
 	if (newMargLeft >= 0 && newMargLeft <= ao.timelineWidth) {
@@ -235,5 +232,4 @@ function theDOMHasLoaded(e) {
 	// Populate Audio List
 	populateAudioList();
 	populateComponentDictionary();
-	//	getDuration();
 }
