@@ -56,7 +56,7 @@ function populateAudioList() {
  * {key=element id : value=index of audioList} */
 function populateComponentDictionary() {
 	for (i = 0; i < audioList.length; i++) {
-		console.log(i);
+		componentDict[audioList[i].audio.id] = i;
 		componentDict[audioList[i].playbutton.id] = i;
 		componentDict[audioList[i].timeline.id] = i;
 		componentDict[audioList[i].playhead.id] = i;
@@ -67,6 +67,7 @@ function populateComponentDictionary() {
 AudioObject.prototype.addEventListeners = function () {
 	this.audio.addEventListener("timeupdate", AudioObject.prototype.timeUpdate, false);
 	this.timeline.addEventListener("click", AudioObject.prototype.timelineClick, false);
+	this.playbutton.addEventListener("click", AudioObject.prototype.pressPlay, false);
 }
 
 /* getDuration
@@ -85,6 +86,14 @@ function getDuration() {
 ///////////////////////////////////////////////
 // Update Audio Player
 ///////////////////////////////////////////////
+
+/* pressPlay() 
+ * call play() for correct AudioObject
+ */
+AudioObject.prototype.pressPlay = function () {
+	var index = getAudioListIndex(this.id);
+	audioList[index].play();
+}
 
 /* play() 
  * play or pause selected audio, if there is a song playing pause it
@@ -143,14 +152,11 @@ function changeClass(element, newClasses) {
 }
 
 /* getAudioListIndex
- * Given an id, find the index of element in audioList */
+ * Given an element's id, find the index in audioList for the correct AudioObject */
 function getAudioListIndex(id) {
-	for (x in audioList) {
-		if (audioList[x].id == id) {
-			return x;
-		}
-	}
+	return componentDict[id];
 }
+
 /* clickPercent()
  * returns click as decimal (.77) of the total timelineWidth */
 function clickPercent(e, timeline) {
