@@ -2,7 +2,7 @@
 // Audio Element
 
 // Event listener for DOM
-document.addEventListener("DOMContentLoaded", theDomHasLoaded, false);
+document.addEventListener("DOMContentLoaded", theDOMHasLoaded, false);
 
 // array of audio files
 var files = ["driveslow.m4a", // 0 = 272 secs
@@ -42,6 +42,17 @@ AudioObject.prototype.bindAudioPlayer = function (num) {
 	this.timelineWidth = this.timeline.offsetWidth - this.playhead.offsetWidth
 }
 
+/* addEventListeners() */
+AudioObject.prototype.addEventListeners = function () {
+	this.audio.addEventListener("timeupdate", AudioObject.prototype.timeUpdate, false);
+	this.audio.addEventListener("durationchange", AudioObject.prototype.durationChange, false);
+	this.timeline.addEventListener("click", AudioObject.prototype.timelineClick, false);
+	this.playbutton.addEventListener("click", AudioObject.prototype.pressPlay, false);
+	// Makes playhead draggable 
+	this.playhead.addEventListener('mousedown', AudioObject.prototype.mouseDown, false);
+	window.addEventListener('mouseup', mouseUp, false);
+}
+
 /* populateAudioList */
 function populateAudioList() {
 	var audioElements = document.getElementsByClassName("audio");
@@ -65,32 +76,18 @@ function populateComponentDictionary() {
 	}
 }
 
-/* addEventListeners() */
-AudioObject.prototype.addEventListeners = function () {
-	this.audio.addEventListener("timeupdate", AudioObject.prototype.timeUpdate, false);
-	this.timeline.addEventListener("click", AudioObject.prototype.timelineClick, false);
-	this.playbutton.addEventListener("click", AudioObject.prototype.pressPlay, false);
-	// Makes playhead draggable 
-	this.playhead.addEventListener('mousedown', AudioObject.prototype.mouseDown, false);
-	window.addEventListener('mouseup', mouseUp, false);
-}
 
-/* getDuration
- * get Duration and update audioList
- */
-function getDuration() {
-	for (i = 0; i < audioList.length; i++) {
-		audioList[i].audio.addEventListener("durationchange", function () {
-			var duration = document.getElementById(this.id).duration;
-			var index = getAudioListIndex(this.id);
-			audioList[index].duration = duration;
-		}, false);
-	}
-}
 
 ///////////////////////////////////////////////
 // Update Audio Player
 ///////////////////////////////////////////////
+
+/* durationChange
+ * set duration for AudioObject */
+AudioObject.prototype.durationChange = function () {
+	var ao = audioList[getAudioListIndex(this.id)];
+	ao.duration = this.duration;
+}
 
 /* pressPlay() 
  * call play() for correct AudioObject
@@ -137,8 +134,8 @@ AudioObject.prototype.mouseDown = function (event) {
 	ao.audio.removeEventListener('timeupdate', AudioObject.prototype.timeUpdate, false);
 }
 
-// mouseUp EventListener
-// getting input from all mouse clicks
+/* mouseUp EventListener
+ * getting input from all mouse clicks */
 function mouseUp(e) {
 	if (onplayhead != null) {
 		var ao = audioList[getAudioListIndex(onplayhead)];
@@ -228,17 +225,15 @@ function createAudioPlayers() {
 	}
 }
 
-function theDomHasLoaded(e) {
-	// Create audio elements and audio players
+/* theDOMHasLoaded()
+ * Execute when DOM is loaded */
+function theDOMHasLoaded(e) {
+	// Generate HTML for audio elements and audio players
 	createAudioElements();
 	createAudioPlayers();
 
 	// Populate Audio List
 	populateAudioList();
 	populateComponentDictionary();
-	getDuration();
-
-
-
-
+	//	getDuration();
 }
