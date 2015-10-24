@@ -1,3 +1,6 @@
+// Might want to make a lookup table so I have each element associated with the proper
+// Audio Element
+
 // Event listener for DOM
 document.addEventListener("DOMContentLoaded", theDomHasLoaded, false);
 
@@ -14,10 +17,12 @@ var files = ["driveslow.m4a", // 0 = 272 secs
 
 // array for AudioObjects
 var audioList = [];
+// components and the index for their AudioObject
+var componentDict = {};
 // store AudioObject that is currently playing
 var playingAudio = null;
 
-// AudioObject Constructor
+/* AudioObject Constructor */
 function AudioObject(audio, duration) {
 	this.audio = audio;
 	this.id = audio.id;
@@ -33,10 +38,9 @@ AudioObject.prototype.bindAudioPlayer = function (num) {
 	this.timeline = document.getElementById("timeline-" + num);
 	this.playhead = document.getElementById("playhead-" + num);
 	this.timelineWidth = this.timeline.offsetWidth - this.playhead.offsetWidth
-
 }
 
-// populateAudioList
+/* populateAudioList */
 function populateAudioList() {
 	var audioElements = document.getElementsByClassName("audio");
 	for (i = 0; i < audioElements.length; i++) {
@@ -48,14 +52,26 @@ function populateAudioList() {
 	}
 }
 
-/* addEventListeners() */
-AudioObject.prototype.addEventListeners = function () {
-	console.log("Add Event Listeners");
-	this.audio.addEventListener("timeupdate", AudioObject.prototype.timeUpdate, false);
+/* populateComponentDictionary() 
+ * {key=element id : value=index of audioList} */
+function populateComponentDictionary() {
+	for (i = 0; i < audioList.length; i++) {
+		console.log(i);
+		componentDict[audioList[i].playbutton.id] = i;
+		componentDict[audioList[i].timeline.id] = i;
+		componentDict[audioList[i].playhead.id] = i;
+	}
 }
 
-// getDuration
-// get Duration and update audioList
+/* addEventListeners() */
+AudioObject.prototype.addEventListeners = function () {
+	this.audio.addEventListener("timeupdate", AudioObject.prototype.timeUpdate, false);
+	this.timeline.addEventListener("click", AudioObject.prototype.timelineClick, false);
+}
+
+/* getDuration
+ * get Duration and update audioList
+ */
 function getDuration() {
 	for (i = 0; i < audioList.length; i++) {
 		audioList[i].audio.addEventListener("durationchange", function () {
@@ -91,9 +107,20 @@ AudioObject.prototype.play = function () {
 	}
 }
 
-// timeUpdate 
-// Synchronizes playhead position with current point in audio 
-// this is the html audio element
+/* timelineClick()
+ *
+ */
+AudioObject.prototype.timelineClick = function (event) {
+	console.log("This: " + this.id);
+	// find audio object
+	//	moveplayhead(event);
+	//	music.currentTime = duration * clickPercent(event);
+}
+
+/* timeUpdate 
+ * Synchronizes playhead position with current point in audio 
+ * this is the html audio element
+ */
 AudioObject.prototype.timeUpdate = function () {
 	// audio element's AudioObject
 	var audioObject = audioList[getAudioListIndex(this.id)];
@@ -109,14 +136,14 @@ AudioObject.prototype.timeUpdate = function () {
 // Utility Methods
 ///////////////////////////////////////////////
 
-// changeClass 
-// - overwrites element's class names
+/* changeClass 
+ * overwrites element's class names */
 function changeClass(element, newClasses) {
 	element.className = newClasses;
 }
 
-// getAudioListIndex
-// Given an id, find the index of element in audioList
+/* getAudioListIndex
+ * Given an id, find the index of element in audioList */
 function getAudioListIndex(id) {
 	for (x in audioList) {
 		if (audioList[x].id == id) {
@@ -124,13 +151,18 @@ function getAudioListIndex(id) {
 		}
 	}
 }
+/* clickPercent()
+ * returns click as decimal (.77) of the total timelineWidth */
+function clickPercent(e, timeline) {
+	return (e.pageX - timeline.offsetLeft) / timelineWidth;
+}
 
 ///////////////////////////////////////////////
 // GENERATE HTML FOR AUDIO ELEMENTS AND PLAYERS
 ///////////////////////////////////////////////
 
-// createAudioElements
-// create audio elements for each file in files
+/* createAudioElements
+ * create audio elements for each file in files */
 function createAudioElements() {
 	for (f in files) {
 		var audioString = "<audio id=\"audio-" + f + "\" class=\"audio\" preload=\"true\"><source src=\"audio/" + files[f] + "\"></audio>";
@@ -138,8 +170,8 @@ function createAudioElements() {
 	}
 }
 
-// createAudioPlayers
-// create audio players for each file in files
+/* createAudioPlayers
+ * create audio players for each file in files */
 function createAudioPlayers() {
 	for (f in files) {
 		var playerString = "<div id=\"audioplayer-" + f + "\" class=\"audioplayer\"><button id=\"playbutton-" + f + "\" class=\"play playbutton\"></button><div id=\"timeline-" + f + "\" class=\"timeline\"><div id=\"playhead-" + f + "\" class=\"playhead\"></div></div></div>";
@@ -154,6 +186,7 @@ function theDomHasLoaded(e) {
 
 	// Populate Audio List
 	populateAudioList();
+	populateComponentDictionary();
 	getDuration();
 
 
