@@ -132,9 +132,7 @@ AudioObject.prototype.timelineClick = function (event) {
 /* mouseDown */
 AudioObject.prototype.mouseDown = function (event) {
 	onplayhead = this.id;
-	console.log("mouseDown, onplayhead: "+onplayhead);
 	var ao = audioList[getAudioListIndex(this.id)];
-
 	window.addEventListener('mousemove', moveplayhead, true);
 	ao.audio.removeEventListener('timeupdate', AudioObject.prototype.timeUpdate, false);
 }
@@ -143,7 +141,6 @@ AudioObject.prototype.mouseDown = function (event) {
 // getting input from all mouse clicks
 function mouseUp(e) {
 	if (onplayhead != null) {
-		console.log("MOUSEUP NOT NULL");
 		var ao = audioList[getAudioListIndex(onplayhead)];
 		//		moveplayhead(e);
 		window.removeEventListener('mousemove', moveplayhead, true);
