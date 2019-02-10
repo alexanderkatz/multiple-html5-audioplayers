@@ -14,11 +14,11 @@
 }
 
 .play {
-	background: url('http://www.alexkatz.me/codepen/images/play.png');
+	background: url('../img/play.png');
 }
 
 .pause {
-	background: url('http://www.alexkatz.me/codepen/images/pause.png');
+	background: url('../img/pause.png');
 }
 
 .play,
